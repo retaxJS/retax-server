@@ -107,8 +107,8 @@ If you are using typescript@^1.6, you don't have to do anything, it will detect 
 MIT License (MIT)
 
 
-[gitter-badge]: https://badges.gitter.im/hourliert/retax.svg
-[gitter-link]: https://gitter.im/hourliert/retax?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+[gitter-badge]: https://badges.gitter.im/retaxJS/retax.svg
+[gitter-link]: https://gitter.im/retaxJS/retax?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 [travis-badge]: https://travis-ci.org/retaxJS/retax-server.svg?branch=master
 [travis-link]: https://travis-ci.org/retaxJS/retax-server
 [version-badge]: https://badge.fury.io/js/retax-server.svg

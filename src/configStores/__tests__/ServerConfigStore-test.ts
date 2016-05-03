@@ -11,10 +11,7 @@ describe('ServerConfigStore', () => {
   it('set the default config', () => {
     const store = new ServerConfigStore();
 
-    expect(store.config).toEqual({
-      isomorphicTools: undefined,
-      retaxConfig,
-      serverRendering: true,
-    });
+    expect(store.config.retaxConfig).toEqual(retaxConfig);
+    expect(store.config.serverRendering).toEqual(false);
   });
 });

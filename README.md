@@ -57,9 +57,8 @@ const retaxConfig = {
 ```tsx
 import * as express from 'express';
 import cookieParser from 'cookie-parser';
-import WebpackIsomorphicTools from 'webpack-isomorphic-tools'; // this is a NEEDED dependency of retax-server at the moment
 
-import { InversifyKernelFacade } from 'retax-core';
+import { InversifyKernelFacade, InternalConfigStore } from 'retax-core';
 import { Injector, KernelMediator, KernelFactory } from 'retax-di';
 import { ServerBoostrapper, ServerConfigStore } from 'retax-server';
 
@@ -71,25 +70,58 @@ const kernelMediator = new KernelMediator(kernelFactory, injector);
 const serverConfigStore = new ServerConfigStore();
 
 const bootstrapper = new ServerBoostrapper(serverConfigStore, kernelMediator);
+const internalConfigStore = new InternalConfigStore();
 
-const isomorphicTools = new WebpackIsomorphicTools(isomorphicConfig); // check https://github.com/halt-hammerzeit/webpack-isomorphic-tools
-isomorphicTools.server(__dirname).then(() => {
-  const serverConfig = {
-    isomorphicTools,
-    retaxConfig,
-    serverRendering: false, // or true, server rendering is as simple as a boolean!
-  };
+const serverConfig = {
+  retaxConfig,
+  serverRendering: false, // or true, server rendering is as simple as a boolean!
 
-  bootstrapper.config(serverConfig);
+  // if serverRendering = false, retax will use this
+  staticIndex: () => `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>RetaxApp</title>
+      </head>
+      <body class="fullbleed layout vertical">
+        <div id="root" class="flex layout vertical">
+          Loading...
+        </div>
+        <script>
+          window.${internalConfigStore.INITIAL_STATE_KEY} = ${JSON.stringify({})};
+        </script>
+        <!-- Your assets here, eg. /static/bundle.js -->
+      </body>
+    </html>
+  `,
 
-  const app = express();
+  // otherwise, retax will use this
+  dynamicIndex: (app) => {
+    // app is the rendered app. This is genereted by retax
+    const content = renderToString(app);
 
-  app.use(cookieParser());
-  app.use(bootstrapper.bootstrap());
+    return (
+      <html>
+        <body>
+          <div
+            id="root"
+            className="flex layout vertical"
+            dangerouslySetInnerHTML={{ __html: content }}
+          />
+        </body>
+      </html>
+    );
+  },
+};
 
-  app.listen(3000);
-});
+bootstrapper.config(serverConfig);
 
+const app = express();
+
+app.use(cookieParser());
+app.use(bootstrapper.bootstrap());
+
+app.listen(3000);
 ```
 
 

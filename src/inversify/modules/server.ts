@@ -5,11 +5,6 @@ import { IServerConfigStore, ServerConfigStore } from '../../configStores';
 import { IRetaxMiddlewareFactory, StaticMiddlewareFactory, RenderingMiddlewareFactory } from '../../middlewares';
 
 import {
-  IInternalConfigStore, InternalConfigStore,
-  INTERNAL_CONFIG_STORE,
-} from 'retax-core';
-
-import {
   SERVER_BOOTSTRAPPER,
   SERVER_CONFIG_STORE,
   MIDDLEWARE_FACTORY,
@@ -18,7 +13,6 @@ import {
 export default function serverModule(kernel: IKernel): void {
   kernel.bind<IServerBootstrapper>(SERVER_BOOTSTRAPPER).to(ServerBootstrapper);
 
-  kernel.bind<IInternalConfigStore>(INTERNAL_CONFIG_STORE).to(InternalConfigStore).inSingletonScope();
   kernel.bind<IServerConfigStore>(SERVER_CONFIG_STORE).to(ServerConfigStore).inSingletonScope();
 }
 

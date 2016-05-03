@@ -5,6 +5,7 @@ jest.mock('react-helmet');
 /* tslint:disable */
 import * as React from 'react';
 /* tslint:enable */
+import { renderToString } from 'react-dom/server';
 import { Kernel } from 'inversify';
 import { diModule } from 'retax-di';
 import { connect } from 'react-redux';
@@ -52,16 +53,20 @@ describe('Retax Server', () => {
   };
 
   const serverConfig = {
-    isomorphicTools: {
-      assets: jest.fn(() => ({
-        javascript: {
-          'bundle': '/bundle.js',
-          'vendor': '/vendor.js',
-        },
-      })),
+    dynamicIndex: (app, store): JSX.Element => {
+      const content = renderToString(app);
+
+      return (
+        <div
+          id="root"
+          className="flex layout vertical"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      );
     },
     retaxConfig,
     serverRendering: undefined,
+    staticIndex: (): string => 'Hey Static',
   };
 
   pit('bootstraps a retax on server without server rendering', async () => {
@@ -84,24 +89,7 @@ describe('Retax Server', () => {
 
     middleware(req as any, res as any, next as any);
 
-    expect(res.send).toBeCalledWith(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>RetaxTest</title>
-          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-        </head>
-        <body class="fullbleed layout vertical">
-          <div id="root" class="flex layout vertical">
-            Loading...
-          </div>
-          <script>
-            window.__INITIAL_STATE__ = ${JSON.stringify({})};
-          </script>
-          <script src="/bundle.js" defer></script><script src="/vendor.js" defer></script>
-        </body>
-      </html>
-    `);
+    expect(res.send).toBeCalledWith('Hey Static');
   });
 
   pit('bootstraps a retax on server with server rendering', async () => {

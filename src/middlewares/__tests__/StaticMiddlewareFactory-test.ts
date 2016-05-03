@@ -1,5 +1,4 @@
 jest.unmock('inversify');
-jest.unmock('retax-core');
 jest.unmock('../StaticMiddlewareFactory');
 
 import StaticMiddlewareFactory from '../StaticMiddlewareFactory';
@@ -8,28 +7,13 @@ describe('StaticMiddlewareFactory', () => {
   // serverConfigStore mock
   const serverConfigStore = {
     config: {
-      isomorphicTools: {
-        assets: jest.fn(() => ({
-          javascript: {
-            'bundle': '/bundle.js',
-            'vendor': '/vendor.js',
-          },
-        })),
-      },
-    },
-  };
-
-  // internalConfigStore mock
-  const internalConfigStore = {
-    config: {
-      INITIAL_STATE_KEY: '__INITIAL_STATE__',
+      staticIndex: (): string => 'Hey',
     },
   };
 
   it('creates a middleware and respond to a request', () => {
     const factory = new StaticMiddlewareFactory(
-      <any>serverConfigStore,
-      <any>internalConfigStore
+      <any>serverConfigStore
     );
     const middleware = factory.create();
 
@@ -39,38 +23,15 @@ describe('StaticMiddlewareFactory', () => {
       send,
     };
     const next = jest.fn();
-    const assets = serverConfigStore.config.isomorphicTools.assets();
 
     middleware(undefined, <any>res, <any>next);
 
-    expect(send).toBeCalledWith(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>RetaxTest</title>
-          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-        </head>
-        <body class="fullbleed layout vertical">
-          <div id="root" class="flex layout vertical">
-            Loading...
-          </div>
-          <script>
-            window.${internalConfigStore.config.INITIAL_STATE_KEY} = ${JSON.stringify({})};
-          </script>
-          ${
-            Object.keys(assets.javascript).map((scriptName: string, i: number) => (
-              `<script src="${assets.javascript[scriptName]}" defer></script>`
-            )).join('')
-          }
-        </body>
-      </html>
-    `);
+    expect(send).toBeCalledWith('Hey');
   });
 
   it('creates a middleware and handle error', () => {
     const factory = new StaticMiddlewareFactory(
-      <any>serverConfigStore,
-      <any>undefined
+      <any>serverConfigStore
     );
     const middleware = factory.create();
 

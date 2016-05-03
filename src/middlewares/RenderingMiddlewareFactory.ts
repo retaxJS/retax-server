@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 import {
   serverModule, contextModuleFactory, lifecycleModuleFactory,
   IRetaxMediator, MEDIATOR,
+  IReduxFacade, REDUX_FACADE,
 } from 'retax-core';
 import { IKernelMediator, KERNEL_MEDIATOR } from 'retax-di';
 
@@ -21,7 +22,7 @@ export default class RenderingMiddlewareFactory implements IRetaxMiddlewareFacto
   ) {}
 
   public create(): IRetaxMiddleware {
-    const { retaxConfig, isomorphicTools } = this._configStore.config;
+    const { retaxConfig, dynamicIndex } = this._configStore.config;
 
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
@@ -33,19 +34,21 @@ export default class RenderingMiddlewareFactory implements IRetaxMiddlewareFacto
         // create IOC kernel
         const kernel = this._kernelMediator.create([
           serverModule,
-          contextModuleFactory({ history, retaxConfig, request: { req, res, isomorphicTools } }),
+          contextModuleFactory({ history, retaxConfig, request: { req, res } }),
           lifecycleModuleFactory(retaxConfig.lifecycle),
         ]);
 
         // builder the app
         const mediator = kernel.getService<IRetaxMediator>(MEDIATOR);
+        const reduxFacade = kernel.getService<IReduxFacade>(REDUX_FACADE);
         const app = await mediator.run(kernel);
 
         // reload the kernel (usefull if the user uses code splitting)
         this._kernelMediator.reload(kernel);
 
         // render!
-        const markup = renderToString(app);
+        const finalApp = dynamicIndex(app, reduxFacade.store);
+        const markup = renderToString(finalApp);
 
         res.send(markup);
       } catch (e) {

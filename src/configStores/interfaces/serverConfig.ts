@@ -1,9 +1,11 @@
+import { Store } from 'redux';
 import { IConfigStore } from 'retax-utils';
-import { IRetaxConfig, IIsomorphicTools } from 'retax-core';
+import { IRetaxConfig } from 'retax-core';
 
 export interface IServerConfig {
   serverRendering?: boolean;
-  isomorphicTools?: IIsomorphicTools;
+  staticIndex?: () => string;
+  dynamicIndex?: (app: JSX.Element, store: Store<any>) => JSX.Element;
   retaxConfig?: IRetaxConfig;
 }
 

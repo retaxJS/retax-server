@@ -2,6 +2,10 @@
 
 jest.mock('react-dom/server');
 
+/* tslint:disable */
+import * as React from 'react';
+/* tslint:enable */
+
 import RenderingMiddlewareFactory from '../RenderingMiddlewareFactory';
 
 describe('RenderingMiddlewareFactory Flow', () => {
@@ -11,7 +15,7 @@ describe('RenderingMiddlewareFactory Flow', () => {
   };
   const serverConfig = {
     config: {
-      isomorphicTools: undefined,
+      dynamicIndex: (app, store): JSX.Element => <div>Hey</div>,
       retaxConfig,
     },
   };
@@ -30,8 +34,8 @@ describe('RenderingMiddlewareFactory Flow', () => {
 
   pit('controls the bootstrapping process', async () => {
     const factory = new RenderingMiddlewareFactory(
-      <any>serverConfig,
-      <any>kernelMediator
+      serverConfig as any,
+      kernelMediator as any
     );
 
     const middleware = factory.create();
@@ -46,7 +50,7 @@ describe('RenderingMiddlewareFactory Flow', () => {
     };
     const next = jest.fn();
 
-    await middleware(<any>req, <any>res, <any>next);
+    await middleware(req as any, res as any, next as any);
 
     expect(kernelMediator.create).toBeCalled();
     expect(kernelMediator.reload).toBeCalled();

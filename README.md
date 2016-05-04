@@ -58,7 +58,7 @@ const retaxConfig = {
 import * as express from 'express';
 import cookieParser from 'cookie-parser';
 
-import { InversifyKernelFacade, InternalConfigStore } from 'retax-core';
+import { InversifyKernelFacade, INITIAL_STATE_KEY } from 'retax-core';
 import { Injector, KernelMediator, KernelFactory } from 'retax-di';
 import { ServerBoostrapper, ServerConfigStore } from 'retax-server';
 
@@ -70,7 +70,6 @@ const kernelMediator = new KernelMediator(kernelFactory, injector);
 const serverConfigStore = new ServerConfigStore();
 
 const bootstrapper = new ServerBoostrapper(serverConfigStore, kernelMediator);
-const internalConfigStore = new InternalConfigStore();
 
 const serverConfig = {
   retaxConfig,
@@ -88,7 +87,7 @@ const serverConfig = {
           Loading...
         </div>
         <script>
-          window.${internalConfigStore.INITIAL_STATE_KEY} = ${JSON.stringify({})};
+          window.${INITIAL_STATE_KEY} = ${JSON.stringify({})};
         </script>
         <!-- Your assets here, eg. /static/bundle.js -->
       </body>

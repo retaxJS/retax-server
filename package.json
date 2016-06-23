@@ -40,7 +40,7 @@
     "inversify-dts": "1.0.3",
     "retax-core": "^1.1.0",
     "retax-di": "^1.1.0",
-    "retax-utils": "^1.0.1"
+    "retax-utils": "^1.0.2"
   },
   "devDependencies": {
     "builder": "^2.9.1",

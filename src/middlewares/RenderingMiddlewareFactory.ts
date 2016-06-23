@@ -3,7 +3,7 @@ import { renderToString } from 'react-dom/server';
 import { createMemoryHistory } from 'react-router';
 import { Request, Response, NextFunction } from 'express';
 import {
-  serverModule, contextModuleFactory, lifecycleModuleFactory,
+  commonModule, serverModule, contextModuleFactory, lifecycleModuleFactory,
   IRetaxMediator, MEDIATOR,
   IReduxFacade, REDUX_FACADE,
 } from 'retax-core';
@@ -33,6 +33,7 @@ export default class RenderingMiddlewareFactory implements IRetaxMiddlewareFacto
 
         // create IOC kernel
         const kernel = this._kernelMediator.create([
+          commonModule,
           serverModule,
           contextModuleFactory({ history, retaxConfig, request: { req, res } }),
           lifecycleModuleFactory(retaxConfig.lifecycle),

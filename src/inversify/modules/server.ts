@@ -1,4 +1,4 @@
-import { IKernel, IKernelModule } from 'inversify';
+import { KernelModule, interfaces } from 'inversify';
 
 import { IServerBootstrapper, ServerBootstrapper } from '../../bootstrap';
 import { IServerConfigStore, ServerConfigStore } from '../../configStores';
@@ -10,18 +10,18 @@ import {
   MIDDLEWARE_FACTORY,
 } from '../identifiers';
 
-export default function serverModule(kernel: IKernel): void {
-  kernel.bind<IServerBootstrapper>(SERVER_BOOTSTRAPPER).to(ServerBootstrapper);
+export default new KernelModule((bind: interfaces.Bind) => {
+  bind<IServerBootstrapper>(SERVER_BOOTSTRAPPER).to(ServerBootstrapper);
 
-  kernel.bind<IServerConfigStore>(SERVER_CONFIG_STORE).to(ServerConfigStore).inSingletonScope();
-}
+  bind<IServerConfigStore>(SERVER_CONFIG_STORE).to(ServerConfigStore).inSingletonScope();
+});
 
-export function middlewareFactoryModuleFactory(serverRendering: boolean): IKernelModule {
-  return function middlewareFactoryModule(kernel: IKernel): void {
+export function middlewareFactoryModuleFactory(serverRendering: boolean): interfaces.KernelModule {
+  return new KernelModule((bind: interfaces.Bind) => {
     if (serverRendering) {
-      kernel.bind<IRetaxMiddlewareFactory>(MIDDLEWARE_FACTORY).to(RenderingMiddlewareFactory);
+      bind<IRetaxMiddlewareFactory>(MIDDLEWARE_FACTORY).to(RenderingMiddlewareFactory);
     } else {
-      kernel.bind<IRetaxMiddlewareFactory>(MIDDLEWARE_FACTORY).to(StaticMiddlewareFactory);
+      bind<IRetaxMiddlewareFactory>(MIDDLEWARE_FACTORY).to(StaticMiddlewareFactory);
     }
-  };
+  });
 }
